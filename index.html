@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Result </title>
+<style>
+    /* Base Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column; /* Align items vertically */
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Full viewport height */
+    color: #333;
+    position: relative;
+}
+
+/* Top Heading Style */
+h2 {
+    position: absolute; /* Position at the top */
+    top: 20px; /* Set distance from the top */
+    left: 50%;
+    transform: translateX(-50%); /* Center horizontally */
+    margin: 0; /* Remove default margin */
+    font-size: 1.5rem;
+    color: black;
+}
+
+/* Container for Centering Content */
+.container {
+    width: 100%;
+    max-width: 600px;
+    padding: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 2, 2);
+    border-radius: 8px;
+    text-align: center;
+}
+
+/* Heading Styles */
+h1 {
+    color: #007BFF;
+    margin-bottom: 20px;
+    font-size: 2rem;
+}
+
+/* Input Field and Button Styles */
+input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus {
+    border-color: #007BFF;
+    outline: none;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    font-size: 1rem;
+    color: #ffffff;
+    background-color: #007BFF;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Result Section Styles */
+#result {
+    margin-top: 20px;
+    text-align: left;
+}
+
+#result h3 {
+    color: #28a745;
+}
+
+#result p {
+    margin: 5px 0;
+    font-size: 1rem;
+    color: #555;
+}
+
+/* Responsive Design for Smaller Screens */
+@media (max-width: 600px) {
+    .container {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    input[type="text"], button {
+        font-size: 0.9rem;
+    }
+
+    header {
+        position: absolute; /* Position at the top */
+        top: 50px; /* Set distance from the top */
+        left: 50%;
+        transform: translateX(-50%); /* Center horizontally */
+        margin: 0; /* Remove default margin */
+        font-size: 7rem; /* Increased size */
+        color: red;
+    }
+img{
+        width: 150px;
+        height: 170px;
+}
+}
+header{
+    background-color: peachpuff;
+}
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #dddddd;
+  }
+
+</style>
+    <link rel="icon" type="image/x-icon" href="WhatsApp Image 2024-09-01 at 5.08.54 PM.jpeg">
+</head>
+<body>
+    <header>
+        <div class="head-min" style="display: flex;">
+            <img src="WhatsApp Image 2024-09-01 at 5.08.54 PM.jpeg" alt="" style="width: 300px; height: 200px;"><br>
+            <h2 style="color: red; font-size: 35px; ;">Shri Radhey Computer Coaching Centre</h2>
+        </div>
+    </header>
+    <div class="container" style="top: 1000px;">
+        <h1>Result Finder</h1>
+        <input type="text" id="rollNumber" placeholder="Enter Roll Number">
+        <button onclick="findResult()">Find Result</button>
+        <div id="result"></div>
+    </div>
+
+    <!-- SheetJS library for reading Excel files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        let workbook;
+
+        // Manually encoded Excel data or load from server
+        const excelBase64 = 'U3IgTm8uCU5hbWUJRmF0aGVyTmFtZQlSb2xsTnVtYmVyCVN1YmplY3QJQmFzaWNNYXJrcwlFbmdsaXNoVHlwaW5nCUhpbmRpVHlwaW5nCVByYWN0aWNhbAlUb3RhbE1hcmtzCVN0YXR1cwoxCVZpa2FzaCBLdW1hcglNZWdoIFNpbmdoCVNJOTQxNzY0CUNvbXB1dGVyIEJhc2ljCTIzCTEyCTA2CTQwCTgxCUdvb2QKMglTYW5qYXkJVmlub2QgU2luZ2gJU0k3NTQ4MzMJQ29tcHV0ZXIgQmFzaWMJLQktCS0JLQkwMAlGYWlsCjMJU2hhbnRhbnUgQ2hhdWRoYXJ5CVJpbmt1IENoYXVkaGFyeQlTSTUxMTY2MAlDb21wdXRlciBCYXNpYwkyMQkxMgkwMAkxNQk0OAlGYWlsCjQJTXVyc2xpbglLYXlhbXVkZGluCVNJNjkxNjMzCUNvbXB1dGVyIEJhc2ljCTE4CTEwCTAxCTE1CTQ0CUZhaWwKNQlBZGl0eWEgUHJhdGFwCUhyaW9tIFNpbmdoCVNJNTkzMDIxCUNvbXB1dGVyIEJhc2ljCTI2CTIxCTE4CTQ1CTExMAlWZXJ5IEdvb2QKNglBbWl0IEt1bWFyCVJhbWVzaCBDaGFuZHJhCVNJNDQ4MTcxCUNvbXB1dGVyIEJhc2ljCTE0CTE0CTA3CS0JMzUJRmFpbAo3CVN3ZXRhCVNhdGVuZHJhIFBhbCBTaW5naAlTSTY4MDc4NglDb21wdXRlciBCYXNpYwkyMwkxNAkwNwkzNQk3OQlQYXNzCjgJU3VyYWtzaGEgS3VtYXJpCU11a2VzaCBLdW1hcglTSTgyMzIxMAlDb21wdXRlciBCYXNpYwkyMQkxNwkwNQkyOAk3MQlQYXNzCjkJS3Vta3VtIEt1bWFyaQlEYXVqaSBSYW0JU0kyNzI0NDEJQ29tcHV0ZXIgQmFzaWMJLQktCS0JLQkwMAlGYWlsCjEwCVJ1YnkJTGF4bWkgcmFqIFNpbmdoCVNJNjkwMjQ2CUNvbXB1dGVyIEJhc2ljCTIxCTEyCTA3CTQwCTgwCVBhc3MKMTEJSGFyc2hpdGEgQ2hhdWhhbglEZXYgdmVlciBTaW5naAlTSTc3NTc4OQlDb21wdXRlciBCYXNpYwkyNgkyMwkwMwkyNQk3NwlQYXNzCjEyCVNhbmdhbSBDaGF1ZGhhcnkJU2F0ZWVzaAlTSTk4MjI0MAlDb21wdXRlciBCYXNpYwktCS0JLQktCTAwCUZhaWwKMTMJU2FuaSBTaW5naAlIYXJpb20gU2luZ2gJU0kzMTk0MzgJQ29tcHV0ZXIgQmFzaWMJMjQJMTUJMDMJMzUJNzcJUGFzcwoxNAlBc2h1dG9zaCBDaGF1aGFuCVNhdGlzaCBDaGFuZHJhIENoYXVoYW4JU0k3Mjc2MDkJQ29tcHV0ZXIgQmFzaWMJMjMJMTcJMDcJLQk0NwlGYWlsCjE1CURlZXBhayBTaW5naAlIYXJkYXlhbCBTaW5naAlTSTM0NzQ2MwlDb21wdXRlciBCYXNpYwkyNQkyMQkwNQkyNQk3NglQYXNzCjE2CVZpcGluIFNoYXJtYQlSYXRhbiBLdW1hciBTaGFybWEJU0k2MTcyMDQJQ29tcHV0ZXIgQmFzaWMJMTYJMTUJMDQJMjAJNTUJUGFzcwoxNwlLcmlzaGFuYSBWYXJtYQlEZXZlbmRyYSBLdW1hcglTSTk4NjA0OAlDb21wdXRlciBCYXNpYwktCS0JLQktCTAwCUZhaWwKMTgJVmlwaW4gS3VtYXIJQmhhbnZlcnBhbCBTaW5naAlTSTc2NDQ3MAlDb21wdXRlciBCYXNpYwktCS0JLQktCTAwCUZhaWwKMTkJU2VlbWEJU2hyaXJhbSBNYXVyeWEJU0k2NDMzODcJQ29tcHV0ZXIgQmFzaWMJMzAJMTUJMDYJMzAJODEJR29vZAoyMAlTaGFsdSBLdW1hcmkJVmlqYXkgU2luZ2gJU0k5NjQzNTcJQ29tcHV0ZXIgQmFzaWMJMjEJMTIJMDIJNDAJNzUJUGFzcwoyMQlLbSBOZWhhIFNpbmdoCVZlZXJvYWwgU2luZ2gJU0k4OTY3MzQJQ29tcHV0ZXIgQmFzaWMJMTQJMTYJMDQJNDAJNzQJUGFzcwoyMglQcmVtIENoYXVoYW4JU2F0ZW5kcmEgQ2hhdWhhbglTSTM2Mjc5NAlDb21wdXRlciBCYXNpYwktCS0JLQktCTAwCUZhaWwKMjMJUm9oaXQgS3VtYXIJVmlqYXkgU2luZ2gJU0k2MDM5ODgJQ29tcHV0ZXIgQmFzaWMJMzYJMjQJMTAJNDUJMTE1CVZlcnkgR29vZAoyNAlSZWV0dQlWZWVyIFNpbmdoCVNJNTMxOTAzCUNvbXB1dGVyIEJhc2ljCTIzCTEyCTA0CTQwCTc5CVBhc3MKMjUJR2F1cmF2IExvZGhpCUphZ2RldiBTaW5naAlTSTg2NzY5NQlDb21wdXRlciBCYXNpYwkzNgkyNwkxMQk0NQkxMTkJVmVyeSBHb29kCjI2CVN1cmFqIEdhdXIJRGV2ZHV0dCBTaGFybWEJU0kzMTk5NjgJQ29tcHV0ZXIgQmFzaWMJLQktCS0JLQkwMAlGYWlsCjI3CVByYXRlZWsgUmFnaGF2CVB1c2hwZW5kcmEgS3VtYXIJU0k0NTQxOTcJQ29tcHV0ZXIgQmFzaWMJLQktCS0JLQkwMAlGYWlsCg=='; // Replace with actual base64 string
+
+        function initializeWorkbook() {
+            const binaryStr = atob(excelBase64);
+            const len = binaryStr.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryStr.charCodeAt(i);
+            }
+            workbook = XLSX.read(bytes, { type: 'array' });
+        }
+
+        // Initialize workbook when the page loads
+        window.onload = function() {
+            initializeWorkbook();
+        };
+
+        // Function to find the result based on roll number
+        function findResult() {
+            const rollNumber = document.getElementById('rollNumber').value;
+            if (!workbook) {
+                alert("Workbook is not loaded.");
+                return;
+            }
+            if (!rollNumber) {
+                alert("Please enter a roll number.");
+                return;
+            }
+
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+            const result = jsonData.find(row => row.RollNumber == rollNumber);
+            if (result) {
+                document.getElementById('result').innerHTML = `
+                    <h3>Result Found:</h3>
+                    <th><p>Roll Number: <b>${result.RollNumber}</b></p>
+                    <p>Name: <b>${result.Name}</b></p>
+                    <p>Father's Name: <b>${result.FatherName}</b></p>
+                    <p>Subject: <b>${result.Subject}</b></p>
+                    <table>
+                        <tr>
+    <th>Subject</th>
+    <th>Max. Marks</th>
+    <th>Obt. Marks</th>
+  </tr>
+   <tr>
+    <td>Basic</td>
+    <td>50</td>
+    <td>${result.BasicMarks}</td>
+  </tr>
+   <tr>
+    <td>English Typing</td>
+    <td>50</td>
+    <td>${result.EnglishTyping}</td>
+  </tr>
+   <tr>
+    <td>Hindi Typing</td>
+    <td>50</td>
+    <td>${result.HindiTyping}</td>
+  </tr>
+   <tr>
+    <td>Practical</td>
+    <td>50</td>
+    <td>${result.Practical}</td>
+  </tr>
+                        </table>
+                        <table id="final">
+                            <tr>
+                                <th>Total</th>
+                                <th>Status</th>
+                                </tr>
+                                <tr>
+                                    <td>${result.TotalMarks}</td>
+                                    <td>${result.Status}</td>
+                                    </tr>
+                                    </table>
+                `;
+            } else {
+                document.getElementById('result').innerHTML = "<p>No result found for the entered roll number.</p>";
+            }
+        }
+    </script>
+</body>
+</html>
